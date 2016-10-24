@@ -66,7 +66,7 @@ unsigned int A123Module::getBits(int startBit, int length, unsigned char *buf) {
 
 boolean A123Module::start()
 {
-	if ( CAN_OK != CAN.begin(CAN_500KBPS, MCP_16MHz) ){
+	if ( CAN_OK != CAN.begin(CAN_500KBPS, MCP_8MHz) ){
 		Serial.println("CAN NOT OK");
 		return(false);
 	}
@@ -141,10 +141,10 @@ void A123Module::DecodeCAN(){
 		uint8_t num_mod=0;
 		for (int i=0;i<8;i++){
 			
-			if ( (bufID[i] > 0x200) && (bufID[i] < 0x20F) ){
+			if ( (bufID[i] >= 0x200) && (bufID[i] <= 0x20E) ){
 				num_mod = (bufID[i] & 0xFF);
-				for (int j =0; j<8;j++){
-				}				
+				//for (int j =0; j<8;j++){
+				//}
 				this->modules[num_mod].alive = true;
 				mux_chn=getBits(0,4,fastbuf[i]);
 				this->modules[num_mod].msg_id_recv = getBits(4, 4, fastbuf[i]);
