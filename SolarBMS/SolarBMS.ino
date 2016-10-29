@@ -10,19 +10,19 @@
                     |     _________          |    ARDUINO UNO    |         _____________
     +12V          GATE 0 | ULN2803 |  +12V---| VIN               |        |   MCP2515   |
      |	            |    |         |         |               +5V |--------| VCC         |
-     0--| R2k2 |----0----| 18    1 |<--------| A0             13 |------->| SCK         |_      _
+     0--| R2k2 |----0----| 18    1 |<--------| A0/14          13 |------->| SCK         |_      _
      |                   |         |         |                12 |<-------| MISO   CANH | \/\/\/
      |           GATE 1  |         |         |                11 |------->| MOSI   CANL |_/\/\/\_
      |              |    |         |         |                10 |------->| CS          |
-     0--| R2k2 |----0----| 17    2 |<--------| A1              2 |<-------| INT         |
+     0--| R2k2 |----0----| 17    2 |<--------| A1/15           2 |<-------| INT         |
      |                   |         |         |               GND |--------| GND         |
      |           GATE 2  |         |         |                   |        |_____________|
      |              |    |         |         |                   |
-     0--| R2k2 |----0----| 16    3 |<--------| A2                |                       //RED
+     0--| R2k2 |----0----| 16    3 |<--------| A2/16             |                       //RED
      |                   |         |         |                 7 |------->| R560 |----| LED |------0
      |           GATE 3  |         |         |                   |                       //YELLOW  |
      |              |    |         |         |                 6 |------->| R560 |----| LED |------0
-     0--| R2k2 |----0----| 15    4 |<--------| A3                |                       //GREEN   |
+     0--| R2k2 |----0----| 15    4 |<--------| A3/17             |                       //GREEN   |
      |                   |         |         |                 5 |------->| R560 |----| LED |------0
      0-------------------| 10    9 |----0----| GND               |                                 |
                          |_________|    |    |                 1 |------->| TX                     |
@@ -57,9 +57,9 @@ Die Methode "Decode_CAN()" decocodiert die NAchrichten und legt alle Module und 
 #define MAXMODULES 15
 #define INSTALLEDMODULES 8
 
-#define RedLED 7
+#define RedLED 5
 #define YellowLED 6
-#define GreenLED 5
+#define GreenLED 6
 
 A123Module Battery(10);
 
@@ -71,7 +71,7 @@ uint8_t installedmudules=8;
 uint16_t EEMEM eeMAXCELLVOLTAGE;
 uint16_t EEMEM eeMINCELLVOLTAGE;
 uint8_t EEMEM eeMYID;
-uint8_t EEMEM eeISTALLEDMODULES;
+uint8_t EEMEM eeINSTALLEDMODULES;
 uint8_t EEMEM eePORTPIN[16];
 
 uint8_t errorcounter=0;
@@ -86,6 +86,7 @@ JsonArray& modules = root_out.createNestedArray("modules");
 uint8_t moduleIDs[MAXMODULES];
 uint8_t moduleCount=0;
 
+//Zuordnung von PortPin auf ModulID
 uint8_t PortPin[16];
 
 void CAN_ISR()
@@ -101,7 +102,7 @@ void setup()
 
 	/* EEPROM Einlesesen */
 
-	//vEinlesen der Zuordnung welches Modul hinter welchem MOSFET h�ngt
+	//einlesen der Zuordnung welches Modul hinter welchem MOSFET hängt
 
 	for (int i=0; i<16;i++){
 		PortPin[i]=eeprom_read_byte(&eePORTPIN[i]);
@@ -109,7 +110,7 @@ void setup()
 	// Einlesen der Spannungsgrenzen vom EEPROM
 	maxcellvoltage=eeprom_read_word(&eeMAXCELLVOLTAGE);
 
-	// Sicherheitschecks falls der EEPROM unitiallisiert ist (erste Ausf�hrung):
+	// Sicherheitschecks falls der EEPROM unitiallisiert ist (erste Ausführung):
 	if (maxcellvoltage > ABSMAXVOLTAGE || maxcellvoltage < ABSMINVOLTAGE){
 		maxcellvoltage=ABSMAXVOLTAGE;
 		eeprom_update_word(&eeMAXCELLVOLTAGE, maxcellvoltage);
@@ -123,17 +124,14 @@ void setup()
 	// Einlesen der eingenen ID vom EEPROM
 	myid=eeprom_read_byte(&eeMYID);
 
-
 	pinMode(RedLED, OUTPUT);
 	pinMode(YellowLED, OUTPUT);
 	pinMode(GreenLED, OUTPUT);
 
 	//GATE Mosfets
-	pinMode(A2, OUTPUT); digitalWrite(16,LOW);
-	pinMode(17, OUTPUT); digitalWrite(17,LOW);
-	pinMode(18, OUTPUT); digitalWrite(18,LOW);
-	pinMode(19, OUTPUT); digitalWrite(19,LOW);
-
+	for (int i=14; i<20;i++){
+		pinMode(i, OUTPUT); digitalWrite(i,HIGH);
+	}
 	//Alle LEDs an!
 	digitalWrite(RedLED, HIGH);
 	digitalWrite(YellowLED, HIGH);
@@ -156,7 +154,7 @@ void setup()
 	attachInterrupt(INT0, CAN_ISR, FALLING);
 
 	delay(100);
-	//Mal checken was f�r Module da so sind...
+	//Mal checken was für Module da so sind...
 	//Wir brauchen exakt
 	while (moduleCount != installedmudules){
 		Battery.send_balance(3600);
@@ -166,7 +164,6 @@ void setup()
 		for (int i=0; i<16; i++){
 
 			if ( Battery.modules[i].alive ){
-				modules.add(i);
 				Serial.print("Modul "); Serial.print(moduleCount); Serial.print(": 0x"); Serial.print(i,HEX);
 				Serial.print(" -> "); Serial.println(PortPin[i]);
 				moduleIDs[moduleCount]=i;
@@ -175,6 +172,13 @@ void setup()
 		}
 		Serial.print(moduleCount); Serial.println(" Module gefunden");
 		delay(1000);
+	}
+
+	for (int i=0; i<16; i++){
+
+		if ( Battery.modules[i].alive ){
+			modules.add(i);
+		}
 	}
 }
 
@@ -193,17 +197,9 @@ void step(){
 
 	float voltage=0;
 	uint8_t mod_bal_cnt=0;
-	uint8_t PinEnable[4]={0,0,0,0};
-	uint8_t PinCount=0;
-	uint8_t myerrorcounter=0;
-
+	static uint8_t PinEnable[6]={0,0,0,0,0,0};
 	digitalWrite(GreenLED,HIGH);
-	if (avl_maxcellvoltage > 3500){
-		Battery.send_balance(balance_target+1);
-	}
-	else{
-		Battery.send_balance(maxcellvoltage);
-	}
+	Battery.send_balance(maxcellvoltage);
 	delay(16);
 	Battery.DecodeCAN();
 	for (int i=0; i<moduleCount; i++){
@@ -211,19 +207,15 @@ void step(){
 		if ( Battery.modules[id].alive ){
 
 			if (Battery.modules[id].msg_id_recv != Battery.msg_id_send){
-				Serial.println(Battery.modules[id].msg_id_recv);
 				Battery.modules[id].errorcounter++;
-				//myerrorcounter++;
-				//errorcounter++;
 			}
 			else{
 				Battery.modules[id].errorcounter=0;
 			}
-			myerrorcounter-=8;
-			myerrorcounter=max(myerrorcounter, 0);
-			myerrorcounter=min(myerrorcounter, 15);
 			mod_bal_cnt+=Battery.modules[id].mod_bal_cnt;
+
 			voltage+=Battery.modules[id].avevoltage;
+
 			if (Battery.modules[id].minvoltage < temp_minCV){
 				temp_minCV = Battery.modules[id].minvoltage;
 				temp_minCVMod = id;
@@ -233,14 +225,15 @@ void step(){
 				temp_maxCVMod = id;
 			}
 
-			if (Battery.modules[id].maxvoltage >= maxcellvoltage || Battery.modules[id].minvoltage <= mincellvoltage || Battery.modules[id].errorcounter > 3 ){
-				PinEnable[PortPin[id]-16]=HIGH;
+			if (Battery.modules[id].maxvoltage > ABSMAXVOLTAGE || Battery.modules[id].minvoltage <= ABSMINVOLTAGE || Battery.modules[id].errorcounter > 6 ){
+				PinEnable[PortPin[id]-14]=HIGH;
 
 			}
 			else {
-				if (digitalRead(PortPin[id]-16)==HIGH && Battery.modules[id].maxvoltage > maxcellvoltage-50){
-					PinEnable[PortPin[id]-16]=HIGH;
-				}
+
+				//if (digitalRead(PortPin[id]-14)==HIGH && Battery.modules[id].maxvoltage > maxcellvoltage){
+				//	PinEnable[PortPin[id]-14]=HIGH;
+			//	}
 			}
 		}
 	}
@@ -248,22 +241,13 @@ void step(){
 
 
 	int bits=0;
-/*	if (myerrorcounter > 0 || moduleCount != 8){
-		digitalWrite(RedLED,HIGH);
-		digitalWrite(16,HIGH);
-		digitalWrite(17,HIGH);
-		digitalWrite(18,HIGH);
-		digitalWrite(19,HIGH);
-		Serial.println(myerrorcounter);
-	}*/
 
-	for (int i=0; i < 4; i++){
-			if (PinEnable[i]==HIGH){
+	for (int i=14; i < 20; i++){
+			if (PinEnable[i-14]==HIGH){
 				digitalWrite(RedLED,HIGH);
-				bits|=1<<i;
-				//Serial.println(i+16);
+				bits|=1<<(i-14);
 			}
-			digitalWrite(i+16,PinEnable[i]);
+			digitalWrite(i,PinEnable[i-14]);
 	}
 	root_out["Portsa"]=bits;
 	voltage=((voltage*14)/moduleCount)/1000.0;
@@ -292,7 +276,8 @@ void serialEvent() {
 	JsonObject& root = jsonBuffer.parseObject(inputString);
 	if ( root["48VID"] == myid || root["48VID"] == 255 ){
 		uint8_t cmd = root["CMD"];
-		digitalWrite(6,LOW);
+		//digitalWrite(6,LOW);
+		//digitalWrite(A0,LOW);
 		switch(cmd){
 
 			case 0: //set new ID
@@ -303,7 +288,7 @@ void serialEvent() {
 				Serial.println("OK");
 				break;
 
-			case 1: //set new Voltage Borders {"48VID":42,"CMD":1, "maxCV":3500, "minCV":2500}
+			case 1: //set new Voltage Borders {"48VID":255,"CMD":1, "maxCV":3500, "minCV":2500}
 				Serial.println("Set new Voltage borders");
 				maxcellvoltage = root["maxCV"];
 				mincellvoltage = root["minCV"];
@@ -314,12 +299,12 @@ void serialEvent() {
 				Serial.println("OK");
 				break;
 
-			case 2: //send the default Values  {"48VID":42,"CMD":2}
+			case 2: //send the default Values  {"48VID":255,"CMD":2}
 				root_out.printTo(Serial);
 				Serial.println("");
 				break;
 
-			case 3: //assign PortPins  {"48VID":42,"CMD":3,"ID":5,"PortPin": 16}
+			case 3: //assign PortPins  {"48VID":255,"CMD":3,"ID":5,"PortPin": 16}
 				id = root["ID"];
 				Serial.println("Assigning Modules to a PortPin");
 
@@ -330,7 +315,7 @@ void serialEvent() {
 				break;
 
 			case 4: //open all Ports
-				for (int i=16; i<20;i++){
+				for (int i=14; i<20;i++){
 
 					digitalWrite(i, HIGH);
 					delay(50);
@@ -339,7 +324,7 @@ void serialEvent() {
 
 				break;
 			case 5: //close all Ports
-				for (int i=16; i<20;i++){
+				for (int i=14; i<20;i++){
 					digitalWrite(i, LOW);
 				}
 				break;
