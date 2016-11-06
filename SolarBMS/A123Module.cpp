@@ -66,7 +66,7 @@ unsigned int A123Module::getBits(int startBit, int length, unsigned char *buf) {
 
 boolean A123Module::start()
 {
-	if ( CAN_OK != CAN.begin(CAN_500KBPS, MCP_16MHz) ){
+	if ( CAN_OK != CAN.begin(CAN_500KBPS, MCP_8MHz) ){
 		Serial.println("CAN NOT OK");
 		return(false);
 	}
