@@ -57,9 +57,9 @@ Die Methode "Decode_CAN()" decocodiert die NAchrichten und legt alle Module und 
 #define MAXMODULES 15
 #define INSTALLEDMODULES 8
 
-#define RedLED 5
+#define RedLED 7
 #define YellowLED 6
-#define GreenLED 6
+#define GreenLED 5
 
 A123Module Battery(10);
 
