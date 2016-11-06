@@ -199,7 +199,7 @@ void step(){
 	uint8_t mod_bal_cnt=0;
 	uint8_t PinEnable[6]={0,0,0,0,0,0};
 	if (avl_mincellvoltage > maxcellvoltage && avl_mincellvoltage < ABSMAXVOLTAGE){
-		Battery.send_balance(avl_mincellvoltage);
+		Battery.send_balance(avl_mincellvoltage+1);
 	}
 	else{
 		Battery.send_balance(maxcellvoltage);
