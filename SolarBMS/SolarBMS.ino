@@ -198,8 +198,12 @@ void step(){
 	float voltage=0;
 	uint8_t mod_bal_cnt=0;
 	uint8_t PinEnable[6]={0,0,0,0,0,0};
-
-	Battery.send_balance(maxcellvoltage);
+	if (avl_mincellvoltage > maxcellvoltage && avl_mincellvoltage < ABSMAXVOLTAGE){
+		Battery.send_balance(avl_mincellvoltage);
+	}
+	else{
+		Battery.send_balance(maxcellvoltage);
+	}
 	delay(16);
 	Battery.DecodeCAN();
 
