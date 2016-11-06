@@ -251,7 +251,8 @@ void step(){
 	if (maintance_balance==1){
 		redled=HIGH;
 		for (int i=0; i<6;i++){
-			pinMode(i+14, OUTPUT); digitalWrite(i+14,HIGH);
+			digitalWrite(i+14,HIGH);
+			bits|=1<<(i);
 		}
 	}
 	else{
@@ -348,9 +349,12 @@ void serialEvent() {
 				break;
 			case 5: //maintanance on
 				maintance_balance=1;
+				Serial.println("Maintanance ON");
+
 				break;
 			case 6: //maintance off
 				maintance_balance=0;
+				Serial.println("Maintanance OFF");
 				break;
 			case 7: //set new ID
 				Serial.print("Setting new ID: ");
