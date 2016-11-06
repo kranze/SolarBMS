@@ -79,6 +79,7 @@ uint16_t balance_target=3600;
 uint16_t avl_maxcellvoltage=0;
 uint16_t avl_mincellvoltage=3600;
 uint8_t counter=0;
+uint8_t maintance_balance=0;
 StaticJsonBuffer<200> jsonOutBuffer;
 JsonObject& root_out = jsonOutBuffer.createObject();
 JsonArray& modules = root_out.createNestedArray("modules");
@@ -198,7 +199,7 @@ void step(){
 	float voltage=0;
 	uint8_t mod_bal_cnt=0;
 	uint8_t PinEnable[6]={0,0,0,0,0,0};
-	if (avl_mincellvoltage > maxcellvoltage && avl_mincellvoltage < ABSMAXVOLTAGE){
+	if ( ( avl_mincellvoltage > maxcellvoltage && avl_mincellvoltage < ABSMAXVOLTAGE) || maintance_balance == 1){
 		Battery.send_balance(avl_mincellvoltage+1);
 	}
 	else{
@@ -246,12 +247,21 @@ void step(){
 	}
 	uint8_t redled=LOW;
 	int bits=0;
-	for (int i=14; i < 20; i++){
-			if (PinEnable[i-14]==HIGH){
-				redled=HIGH;
-				bits|=1<<(i-14);
-			}
-			digitalWrite(i,PinEnable[i-14]);
+
+	if (maintance_balance==1){
+		redled=HIGH;
+		for (int i=0; i<6;i++){
+			pinMode(i+14, OUTPUT); digitalWrite(i+14,HIGH);
+		}
+	}
+	else{
+		for (int i=14; i < 20; i++){
+				if (PinEnable[i-14]==HIGH){
+					redled=HIGH;
+					bits|=1<<(i-14);
+				}
+				digitalWrite(i,PinEnable[i-14]);
+		}
 	}
 	digitalWrite(RedLED,redled);
 	root_out["myID"]=myid;
@@ -298,6 +308,8 @@ void serialEvent() {
 		switch(cmd){
 
 			case 0: //not allowed
+				root_out.printTo(Serial);
+				Serial.println("");
 				break;
 			case 1: //set new Voltage Borders {"48VID":255,"CMD":1, "maxCV":3500, "minCV":2500}
 				Serial.println("Set new Voltage borders");
@@ -334,13 +346,11 @@ void serialEvent() {
 				Serial.println("OK");
 
 				break;
-			case 5: //close all Ports
-				for (int i=14; i<20;i++){
-					digitalWrite(i, LOW);
-				}
+			case 5: //maintanance on
+				maintance_balance=1;
 				break;
-			case 6: //STOPP CAN
-				Battery.stop();
+			case 6: //maintance off
+				maintance_balance=0;
 				break;
 			case 7: //set new ID
 				Serial.print("Setting new ID: ");
