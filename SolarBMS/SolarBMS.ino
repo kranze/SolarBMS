@@ -129,8 +129,8 @@ void setup()
 	pinMode(GreenLED, OUTPUT);
 
 	//GATE Mosfets
-	for (int i=14; i<20;i++){
-		pinMode(i, OUTPUT); digitalWrite(i,HIGH);
+	for (int i=0; i<6;i++){
+		pinMode(i+14, OUTPUT); digitalWrite(i+14,HIGH);
 	}
 	//Alle LEDs an!
 	digitalWrite(RedLED, HIGH);
@@ -197,11 +197,12 @@ void step(){
 
 	float voltage=0;
 	uint8_t mod_bal_cnt=0;
-	static uint8_t PinEnable[6]={0,0,0,0,0,0};
-	digitalWrite(GreenLED,HIGH);
+	uint8_t PinEnable[6]={0,0,0,0,0,0};
+
 	Battery.send_balance(maxcellvoltage);
 	delay(16);
 	Battery.DecodeCAN();
+
 	for (int i=0; i<moduleCount; i++){
 		uint8_t id = moduleIDs[i];
 		if ( Battery.modules[id].alive ){
@@ -226,10 +227,12 @@ void step(){
 			}
 
 			if (Battery.modules[id].maxvoltage > ABSMAXVOLTAGE || Battery.modules[id].minvoltage <= ABSMINVOLTAGE || Battery.modules[id].errorcounter > 6 ){
+				//Spannung ausserhalb des gültigen bereichs
 				PinEnable[PortPin[id]-14]=HIGH;
-
 			}
 			else {
+				//
+
 
 				//if (digitalRead(PortPin[id]-14)==HIGH && Battery.modules[id].maxvoltage > maxcellvoltage){
 				//	PinEnable[PortPin[id]-14]=HIGH;
@@ -237,18 +240,17 @@ void step(){
 			}
 		}
 	}
-	digitalWrite(RedLED, LOW);
-
-
+	uint8_t redled=LOW;
 	int bits=0;
-
 	for (int i=14; i < 20; i++){
 			if (PinEnable[i-14]==HIGH){
-				digitalWrite(RedLED,HIGH);
+				redled=HIGH;
 				bits|=1<<(i-14);
 			}
 			digitalWrite(i,PinEnable[i-14]);
 	}
+	digitalWrite(RedLED,redled);
+
 	root_out["Portsa"]=bits;
 	voltage=((voltage*14)/moduleCount)/1000.0;
 	avl_mincellvoltage=temp_minCV;
@@ -260,7 +262,18 @@ void step(){
 	root_out["BalActiv"]=mod_bal_cnt;
 	root_out["Voltage"]=voltage;
 	balance_target=avl_mincellvoltage;
+
 	if (mod_bal_cnt > 0){
+		digitalWrite(YellowLED,HIGH);
+	}
+	else{
+		digitalWrite(YellowLED,LOW);
+	}
+
+	if ( (avl_maxcellvoltage-avl_mincellvoltage) < 5 ){
+		digitalWrite(GreenLED,HIGH);
+	}
+	else{
 		digitalWrite(GreenLED,LOW);
 	}
 }
