@@ -254,7 +254,7 @@ void step(){
 			digitalWrite(i,PinEnable[i-14]);
 	}
 	digitalWrite(RedLED,redled);
-
+	root_out["myID"]=myid;
 	root_out["Portsa"]=bits;
 	voltage=((voltage*14)/moduleCount)/1000.0;
 	avl_mincellvoltage=temp_minCV;
@@ -297,14 +297,8 @@ void serialEvent() {
 		//digitalWrite(A0,LOW);
 		switch(cmd){
 
-			case 0: //set new ID
-				Serial.print("Setting new ID: ");
-				myid = root["newID"];
-				Serial.println(myid);
-				eeprom_write_byte(&eeMYID, myid);
-				Serial.println("OK");
+			case 0: //not allowed
 				break;
-
 			case 1: //set new Voltage Borders {"48VID":255,"CMD":1, "maxCV":3500, "minCV":2500}
 				Serial.println("Set new Voltage borders");
 				maxcellvoltage = root["maxCV"];
@@ -348,6 +342,14 @@ void serialEvent() {
 			case 6: //STOPP CAN
 				Battery.stop();
 				break;
+			case 7: //set new ID
+				Serial.print("Setting new ID: ");
+				myid = root["newID"];
+				Serial.println(myid);
+				eeprom_write_byte(&eeMYID, myid);
+				Serial.println("OK");
+				break;
+
 		}
 		delay(100);
 		digitalWrite(6, HIGH);
