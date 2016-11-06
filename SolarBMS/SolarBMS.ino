@@ -200,6 +200,7 @@ void step(){
 	uint8_t mod_bal_cnt=0;
 	uint8_t PinEnable[6]={0,0,0,0,0,0};
 	if ( ( avl_mincellvoltage > maxcellvoltage && avl_mincellvoltage < ABSMAXVOLTAGE) || maintance_balance == 1){
+
 		Battery.send_balance(avl_mincellvoltage+1);
 	}
 	else{
@@ -287,10 +288,15 @@ void step(){
 
 	if ( (avl_maxcellvoltage-avl_mincellvoltage) < 5 ){
 		digitalWrite(GreenLED,HIGH);
+		maintance_balance=0;
 	}
 	else{
 		digitalWrite(GreenLED,LOW);
 	}
+	if ( (avl_maxcellvoltage-avl_mincellvoltage) > 100 ){
+		maintance_balance=1;
+	}
+
 }
 
 void serialEvent() {
