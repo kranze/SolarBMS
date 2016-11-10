@@ -8,18 +8,9 @@
 
 #include "A123Module.h"
 
-
 #define BCM_CMD_ID 0x50
 #define MOD_V_OFFSET 1000
 #define MOD_THERM_OFFSET -40
-
-boolean Flag_Recv;
-uint8_t globalbuffer[64];
-
-uint16_t A123Module::getVoltage()
-{
-	return(avevoltage*7);
-}
 
 void A123Module::setBits(unsigned int startBit, unsigned int length, unsigned char *buf, unsigned int data)
 {
@@ -94,7 +85,6 @@ void A123Module::stop(){
 void A123Module::send_balance(uint16_t voltage){
 	
 	unsigned char buf[8]={0x00, 0x00, 0x00, 0x00, 0x10, 0, 0, 0};
-	
 	unsigned int data;
 	
 	msg_id_send++;
@@ -102,15 +92,13 @@ void A123Module::send_balance(uint16_t voltage){
 		msg_id_send=0;
 	}
 	setBits(0,4,buf,msg_id_send);
-	voltage=min(voltage,3550);
+	voltage=min(voltage,3650);
 		
 	if (voltage<=2400){
-		voltage=3550;
+		voltage=2400;
 	}
-
 	data=(voltage-MOD_V_OFFSET)/0.5;
 	setBits(8,13,buf,data);
-		
 	this->CAN.sendMsgBuf(BCM_CMD_ID,0,8,buf);
 }
 
@@ -127,12 +115,6 @@ void A123Module::ReceiveCAN(){
 			break;
 		}
 	}
-	/*for (i=0;i<8;i++){
-		Serial.print(bufID[i],HEX);
-		Serial.print(" ");
-	}
-	Serial.println();
-	*/
 }
 
 void A123Module::DecodeCAN(){
@@ -140,22 +122,20 @@ void A123Module::DecodeCAN(){
 		uint8_t mux_chn;
 		uint8_t num_mod=0;
 		for (int i=0;i<8;i++){
-			
 			if ( (bufID[i] >= 0x200) && (bufID[i] <= 0x20E) ){
-				num_mod = (bufID[i] & 0xFF);
-				//for (int j =0; j<8;j++){
-				//}
-				this->modules[num_mod].alive = true;
-				mux_chn=getBits(0,4,fastbuf[i]);
+				num_mod = (bufID[i] & 0x00F); //uns reicht die letzte Stelle der ID um die Module eindeutig zu identifizieren
+				this->modules[num_mod].alive = true; //Modul mit ID num_mod gefunden -> Modul im Verbund und am leben
+				mux_chn=getBits(0,4,fastbuf[i]); //Nachricht enthaelt auch einen Multiplexanteil
+				if (mux_chn==0xB){
+					this->modules[num_mod].mod_bal_cnt = getBits(8, 8, fastbuf[i]);
+				}
+				if ( getBits(24, 3, fastbuf[i]) == 2) {
+					this->modules[num_mod].temperature = getBits(8, 8, fastbuf[i]) * 0.5 + MOD_THERM_OFFSET;
+				}
 				this->modules[num_mod].msg_id_recv = getBits(4, 4, fastbuf[i]);
 				this->modules[num_mod].minvoltage = getBits(27, 13, fastbuf[i]) * 0.5 + MOD_V_OFFSET;
 				this->modules[num_mod].maxvoltage = getBits(43, 13, fastbuf[i]) * 0.5 + MOD_V_OFFSET;
 				this->modules[num_mod].avevoltage = getBits(59, 13, fastbuf[i]) * 0.5 + MOD_V_OFFSET;
-				if (mux_chn==0xB)
-					this->modules[num_mod].mod_bal_cnt = getBits(8, 8, fastbuf[i]);
-				if ( getBits(24, 3, fastbuf[i]) == 2) {
-					this->modules[num_mod].temperature = getBits(8, 8, fastbuf[i]) * 0.5 + MOD_THERM_OFFSET;
-				}
 			}
 		}
 	}
@@ -164,13 +144,15 @@ void A123Module::DecodeCAN(){
 // default constructor
 A123Module::A123Module():CAN(CAN_CS)
 {
-	this->minvoltage=3600;
+	this->running=false;
+	this->msg_id_send=0;
 } //A123Module
 
  A123Module::A123Module(uint8_t PinCS)
  :CAN(PinCS)
 {
-	this->minvoltage=3600;
+	this->running=false;
+	this->msg_id_send=0;
 }
 
 // default destructor
