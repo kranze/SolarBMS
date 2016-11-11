@@ -292,7 +292,7 @@ void step(){
 	else{
 		digitalWrite(GreenLED,LOW);
 	}
-	if ( (avl_maxcellvoltage-avl_mincellvoltage) > 100 ){
+	if ( (avl_maxcellvoltage-avl_mincellvoltage) > 200 ){
 		maintance_balance=1;
 	}
 
