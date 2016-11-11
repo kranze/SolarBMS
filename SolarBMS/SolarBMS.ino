@@ -43,7 +43,6 @@ Die Methode "Decode_CAN()" decocodiert die NAchrichten und legt alle Module und 
 
 */
 
-//#include <Event.h>
 #include <EEPROM.h>
 #include <ArduinoJson.h>
 #include <SPI.h>
