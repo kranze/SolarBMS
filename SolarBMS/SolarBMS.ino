@@ -285,7 +285,7 @@ void step(){
 		digitalWrite(YellowLED,LOW);
 	}
 
-	if ( (avl_maxcellvoltage-avl_mincellvoltage) < 5 ){
+	if ( (avl_maxcellvoltage-avl_mincellvoltage) <= 10 ){
 		digitalWrite(GreenLED,HIGH);
 		maintance_balance=0;
 	}
