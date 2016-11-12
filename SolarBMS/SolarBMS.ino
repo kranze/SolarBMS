@@ -231,7 +231,7 @@ void step(){
 				temp_maxCVMod = id;
 			}
 
-			if (Battery.modules[id].maxvoltage > ABSMAXVOLTAGE || Battery.modules[id].minvoltage <= ABSMINVOLTAGE || Battery.modules[id].errorcounter > 6 ){
+			if (/*Battery.modules[id].maxvoltage > ABSMAXVOLTAGE || */Battery.modules[id].minvoltage <= ABSMINVOLTAGE || Battery.modules[id].errorcounter > 6 ){
 				//Spannung ausserhalb des gültigen bereichs
 				PinEnable[PortPin[id]-14]=HIGH;
 			}
@@ -292,7 +292,10 @@ void step(){
 	else{
 		digitalWrite(GreenLED,LOW);
 	}
-	if ( (avl_maxcellvoltage-avl_mincellvoltage) > 200 ){
+	//if ( (avl_maxcellvoltage-avl_mincellvoltage) > 200 ){
+	//	maintance_balance=1;
+	//}
+	if ( avl_maxcellvoltage >= ABSMAXVOLTAGE ){
 		maintance_balance=1;
 	}
 
