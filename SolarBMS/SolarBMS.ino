@@ -287,7 +287,6 @@ void step(){
 
 	if ( (avl_maxcellvoltage-avl_mincellvoltage) <= 10 ){
 		digitalWrite(GreenLED,HIGH);
-		maintance_balance=0;
 	}
 	else{
 		digitalWrite(GreenLED,LOW);
@@ -297,6 +296,9 @@ void step(){
 	//}
 	if ( avl_maxcellvoltage >= ABSMAXVOLTAGE ){
 		maintance_balance=1;
+	}
+	if ((avl_maxcellvoltage-avl_mincellvoltage) == 0){
+		maintance_balance=0;
 	}
 
 }
