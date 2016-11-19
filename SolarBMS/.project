@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>SolarBMS</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>it.baeyens.arduino.core.inoToCpp</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+		<nature>it.baeyens.arduinonature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>core/core</name>
+			<type>2</type>
+			<location>C:/Users/kzm/eclipse/java-mars/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.7/cores/arduino</location>
+		</link>
+		<link>
+			<name>core/variant</name>
+			<type>2</type>
+			<location>C:/Users/kzm/eclipse/java-mars/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.7/variants/standard</location>
+		</link>
+		<link>
+			<name>libraries/ArduinoJson</name>
+			<type>2</type>
+			<location>//esg-gmbh.de/home/kzm/Eigene Dateien/Arduino/libraries/ArduinoJson</location>
+		</link>
+		<link>
+			<name>libraries/EEPROM</name>
+			<type>2</type>
+			<location>C:/Users/kzm/eclipse/java-mars/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.7/libraries/EEPROM</location>
+		</link>
+		<link>
+			<name>libraries/MCP2515_lib-master</name>
+			<type>2</type>
+			<location>//esg-gmbh.de/home/kzm/Eigene Dateien/Arduino/libraries/MCP2515_lib-master</location>
+		</link>
+		<link>
+			<name>libraries/SPI</name>
+			<type>2</type>
+			<location>C:/Users/kzm/eclipse/java-mars/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.7/libraries/SPI</location>
+		</link>
+	</linkedResources>
+</projectDescription>
