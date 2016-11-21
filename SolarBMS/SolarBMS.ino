@@ -390,7 +390,7 @@ void serialEvent() {
 				Serial.print("Setting new number of installed Modules: ");
 				installedmudules = root["instmod"];
 				Serial.println(installedmudules);
-				eeprom_write_byte(&eeMYID, myid);
+				eeprom_write_byte(&eeINSTALLEDMODULES, installedmudules);
 				Serial.println("OK, restarting");
 				delay(100);
 				resetFunc();  //call reset
