@@ -125,6 +125,7 @@ void setup()
 	myid=eeprom_read_byte(&eeMYID);
 
 	installedmudules=eeprom_read_byte(&eeINSTALLEDMODULES);
+
 	pinMode(RedLED, OUTPUT);
 	pinMode(YellowLED, OUTPUT);
 	pinMode(GreenLED, OUTPUT);
@@ -172,7 +173,7 @@ void setup()
 				moduleCount++;
 			}
 		}
-		Serial.print(moduleCount); Serial.println(" Module gefunden. Soll: "); Serial.print(moduleCount);
+		Serial.print(moduleCount); Serial.print(" Module gefunden. Soll: "); Serial.println(installedmudules);
 		delay(1000);
 	}
 
