@@ -391,9 +391,8 @@ void serialEvent() {
 				installedmudules = root["instmod"];
 				Serial.println(installedmudules);
 				eeprom_write_byte(&eeINSTALLEDMODULES, installedmudules);
-				Serial.println("OK, restarting");
-				delay(100);
-				resetFunc();  //call reset
+				Serial.println("OK, please reboot me");
+				while (1);  //call reset
 				break;
 
 		}
