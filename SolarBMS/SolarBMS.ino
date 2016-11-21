@@ -66,6 +66,7 @@ uint16_t maxcellvoltage;
 uint16_t mincellvoltage;
 uint8_t myid;
 uint8_t installedmudules=8;
+uint8_t trys=0;
 
 uint16_t EEMEM eeMAXCELLVOLTAGE;
 uint16_t EEMEM eeMINCELLVOLTAGE;
@@ -88,6 +89,8 @@ uint8_t moduleCount=0;
 
 //Zuordnung von PortPin auf ModulID
 uint8_t PortPin[16];
+
+void(* resetFunc) (void) = 0; //declare reset function @ address 0
 
 void CAN_ISR()
 {
@@ -158,8 +161,8 @@ void setup()
 	delay(100);
 	//Mal checken was für Module da so sind...
 	//Wir brauchen exakt
-	uint8_t trys=0;
-	while (moduleCount != installedmudules){
+
+	while (moduleCount != installedmudules && installedmudules != 255){
 		Battery.send_balance(3600);
 		delay(16);
 		Battery.DecodeCAN();
@@ -174,7 +177,12 @@ void setup()
 			}
 		}
 		Serial.print(moduleCount); Serial.print(" Module gefunden. Soll: "); Serial.println(installedmudules);
-		delay(5000);
+		delay(1000);
+		trys++;
+		if (trys>4){
+			installedmudules=255;
+			break;
+		}
 	}
 
 	for (int i=0; i<16; i++){
@@ -188,7 +196,9 @@ void setup()
 void loop(){
 
 	delay(100);
-	step();
+	if (installedmudules != 255 ){
+		step();
+	}
 }
 
 void step(){
@@ -381,7 +391,8 @@ void serialEvent() {
 				installedmudules = root["instmod"];
 				Serial.println(installedmudules);
 				eeprom_write_byte(&eeMYID, myid);
-				Serial.println("OK");
+				Serial.println("OK, restarting");
+				resetFunc();  //call reset
 				break;
 
 		}
