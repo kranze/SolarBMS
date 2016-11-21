@@ -392,6 +392,7 @@ void serialEvent() {
 				Serial.println(installedmudules);
 				eeprom_write_byte(&eeMYID, myid);
 				Serial.println("OK, restarting");
+				delay(100);
 				resetFunc();  //call reset
 				break;
 
