@@ -174,7 +174,7 @@ void setup()
 			}
 		}
 		Serial.print(moduleCount); Serial.print(" Module gefunden. Soll: "); Serial.println(installedmudules);
-		delay(1000);
+		delay(5000);
 	}
 
 	for (int i=0; i<16; i++){
