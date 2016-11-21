@@ -124,6 +124,7 @@ void setup()
 	// Einlesen der eingenen ID vom EEPROM
 	myid=eeprom_read_byte(&eeMYID);
 
+	installedmudules=eeprom_read_byte(&eeINSTALLEDMODULES);
 	pinMode(RedLED, OUTPUT);
 	pinMode(YellowLED, OUTPUT);
 	pinMode(GreenLED, OUTPUT);
@@ -156,6 +157,7 @@ void setup()
 	delay(100);
 	//Mal checken was für Module da so sind...
 	//Wir brauchen exakt
+	uint8_t trys=0;
 	while (moduleCount != installedmudules){
 		Battery.send_balance(3600);
 		delay(16);
@@ -170,7 +172,7 @@ void setup()
 				moduleCount++;
 			}
 		}
-		Serial.print(moduleCount); Serial.println(" Module gefunden");
+		Serial.print(moduleCount); Serial.println(" Module gefunden. Soll: "); Serial.print(moduleCount);
 		delay(1000);
 	}
 
@@ -370,6 +372,13 @@ void serialEvent() {
 				Serial.print("Setting new ID: ");
 				myid = root["newID"];
 				Serial.println(myid);
+				eeprom_write_byte(&eeMYID, myid);
+				Serial.println("OK");
+				break;
+			case 8: //change number of installed Modules {"48VID":255,"CMD":8,"instmod":8}
+				Serial.print("Setting new number of installed Modules: ");
+				installedmudules = root["instmod"];
+				Serial.println(installedmudules);
 				eeprom_write_byte(&eeMYID, myid);
 				Serial.println("OK");
 				break;
