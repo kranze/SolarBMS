@@ -163,7 +163,9 @@ void setup()
 	//Wir brauchen exakt
 
 	while (moduleCount != installedmudules && installedmudules != 255){
+		Serial.println("Sende balance");
 		Battery.send_balance(3600);
+		Serial.println("balance gesendet");
 		delay(16);
 		Battery.DecodeCAN();
 		moduleCount=0;
