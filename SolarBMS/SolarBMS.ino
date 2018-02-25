@@ -1,4 +1,3 @@
-
 /* A123 BMS */
 /*
 
@@ -67,6 +66,7 @@ uint16_t maxcellvoltage;
 uint16_t mincellvoltage;
 uint8_t myid;
 uint8_t installedmudules=8;
+uint8_t trys=0;
 
 uint16_t EEMEM eeMAXCELLVOLTAGE;
 uint16_t EEMEM eeMINCELLVOLTAGE;
@@ -89,6 +89,8 @@ uint8_t moduleCount=0;
 
 //Zuordnung von PortPin auf ModulID
 uint8_t PortPin[16];
+
+void(* resetFunc) (void) = 0; //declare reset function @ address 0
 
 void CAN_ISR()
 {
@@ -125,6 +127,8 @@ void setup()
 	// Einlesen der eingenen ID vom EEPROM
 	myid=eeprom_read_byte(&eeMYID);
 
+	installedmudules=eeprom_read_byte(&eeINSTALLEDMODULES);
+
 	pinMode(RedLED, OUTPUT);
 	pinMode(YellowLED, OUTPUT);
 	pinMode(GreenLED, OUTPUT);
@@ -157,11 +161,10 @@ void setup()
 	delay(100);
 	//Mal checken was für Module da so sind...
 	//Wir brauchen exakt
-	while (moduleCount != installedmudules){
-    Serial.println("Sende Balance");
+
+	while (moduleCount != installedmudules && installedmudules != 255){
 		Battery.send_balance(3600);
 		delay(16);
-    Serial.println("balance gesendet");
 		Battery.DecodeCAN();
 		moduleCount=0;
 		for (int i=0; i<16; i++){
@@ -173,8 +176,13 @@ void setup()
 				moduleCount++;
 			}
 		}
-		Serial.print(moduleCount); Serial.println(" Module gefunden");
+		Serial.print(moduleCount); Serial.print(" Module gefunden. Soll: "); Serial.println(installedmudules);
 		delay(1000);
+		trys++;
+		if (trys>4){
+			installedmudules=255;
+			break;
+		}
 	}
 
 	for (int i=0; i<16; i++){
@@ -188,7 +196,9 @@ void setup()
 void loop(){
 
 	delay(100);
-	step();
+	if (installedmudules != 255 ){
+		step();
+	}
 }
 
 void step(){
@@ -375,6 +385,14 @@ void serialEvent() {
 				Serial.println(myid);
 				eeprom_write_byte(&eeMYID, myid);
 				Serial.println("OK");
+				break;
+			case 8: //change number of installed Modules {"48VID":255,"CMD":8,"instmod":8}
+				Serial.print("Setting new number of installed Modules: ");
+				installedmudules = root["instmod"];
+				Serial.println(installedmudules);
+				eeprom_write_byte(&eeINSTALLEDMODULES, installedmudules);
+				Serial.println("OK, please reboot me");
+				while (1);  //call reset
 				break;
 
 		}
