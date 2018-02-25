@@ -1,3 +1,4 @@
+
 /* A123 BMS */
 /*
 
@@ -157,8 +158,10 @@ void setup()
 	//Mal checken was für Module da so sind...
 	//Wir brauchen exakt
 	while (moduleCount != installedmudules){
+    Serial.println("Sende Balance");
 		Battery.send_balance(3600);
 		delay(16);
+    Serial.println("balance gesendet");
 		Battery.DecodeCAN();
 		moduleCount=0;
 		for (int i=0; i<16; i++){

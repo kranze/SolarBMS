@@ -34,32 +34,32 @@
 		<link>
 			<name>core/core</name>
 			<type>2</type>
-			<location>C:/Users/kzm/eclipse/java-mars/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.7/cores/arduino</location>
+			<location>C:/Users/Martin/eclipse/java-neon/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/cores/arduino</location>
 		</link>
 		<link>
 			<name>core/variant</name>
 			<type>2</type>
-			<location>C:/Users/kzm/eclipse/java-mars/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.7/variants/standard</location>
+			<location>C:/Users/Martin/eclipse/java-neon/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/variants/standard</location>
 		</link>
 		<link>
 			<name>libraries/ArduinoJson</name>
 			<type>2</type>
-			<location>//esg-gmbh.de/home/kzm/Eigene Dateien/Arduino/libraries/ArduinoJson</location>
+			<location>C:/Users/Martin/eclipse/java-neon/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/libraries/ArduinoJson</location>
 		</link>
 		<link>
 			<name>libraries/EEPROM</name>
 			<type>2</type>
-			<location>C:/Users/kzm/eclipse/java-mars/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.7/libraries/EEPROM</location>
+			<location>C:/Users/Martin/eclipse/java-neon/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/libraries/EEPROM</location>
 		</link>
 		<link>
 			<name>libraries/MCP2515_lib-master</name>
 			<type>2</type>
-			<location>//esg-gmbh.de/home/kzm/Eigene Dateien/Arduino/libraries/MCP2515_lib-master</location>
+			<location>C:/Users/Martin/eclipse/java-neon/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/libraries/MCP2515_lib-master</location>
 		</link>
 		<link>
 			<name>libraries/SPI</name>
 			<type>2</type>
-			<location>C:/Users/kzm/eclipse/java-mars/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.7/libraries/SPI</location>
+			<location>C:/Users/Martin/eclipse/java-neon/eclipse/arduinoPlugin/packages/arduino/hardware/avr/1.6.14/libraries/SPI</location>
 		</link>
 	</linkedResources>
 </projectDescription>
