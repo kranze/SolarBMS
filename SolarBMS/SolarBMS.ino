@@ -156,7 +156,7 @@ void setup()
 
 	//INIT die CAN Kommunikation
 	Battery.start();
-	attachInterrupt(INT0, CAN_ISR, FALLING);
+	//attachInterrupt(INT0, CAN_ISR, FALLING);
 
 	delay(100);
 	//Mal checken was für Module da so sind...
@@ -166,7 +166,7 @@ void setup()
 		Serial.println("Sende balance");
 		Battery.send_balance(3600);
 		Serial.println("balance gesendet");
-		delay(160);
+		delay(16);
 		Battery.DecodeCAN();
 		moduleCount=0;
 		for (int i=0; i<16; i++){
