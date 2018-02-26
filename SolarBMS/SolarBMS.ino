@@ -166,7 +166,7 @@ void setup()
 		Serial.println("Sende balance");
 		Battery.send_balance(3600);
 		Serial.println("balance gesendet");
-		delay(16);
+		delay(160);
 		Battery.DecodeCAN();
 		moduleCount=0;
 		for (int i=0; i<16; i++){
